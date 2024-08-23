@@ -5,8 +5,12 @@
     <title>Учу Django</title>
 </head>
 <body>
+    <form method="POST" novalidate>
+        {% csrf_token %}
     <table>
         {{ form.as_table }}
     </table>
+    <input type="submit" value="Send" >
+</form>
 </body>
 </html>
