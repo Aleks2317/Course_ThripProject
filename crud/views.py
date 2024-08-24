@@ -1,23 +1,24 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from crud.forms import UserForm
+from django.http import HttpResponseRedirect, HttpResponseNotFound
+from crud.models import Person
 
 
-# def index(request):
-#     if request.method == 'POST':
-#         name = request.POST.get('name')  # получить значение поля Имя
-#         age = request.POST.get('age')  # получить значение поля Возраст
-#         return HttpResponse(f'<h2>Привет, {name}, твой возраст {age}</h2>')
-#     userform = UserForm()
-#     return render(request, 'index.html', {'form': userform})
-
+# Получение данных из бд
 def index(request):
-    if request.method == 'POST':
-        userform = UserForm(request.POST)
-        if userform.is_valid:
-            name = userform.cleaned_data['name']  # получить очищенные данные, через объект cleaned_data
-            return HttpResponse(f'<h2>Hello, {name}</h2>')
-        return HttpResponse(f'Invalid date')
-    userform = UserForm()
-    return render(request, 'index.html', {'form': userform})
+    people = Person.objects.all()
+    return render(request, 'index.html', {'people': people})
 
+
+# Сохранение данных в бд
+def create(request):
+    if request.method == 'POST':
+        person = Person()
+        person.name = request.POST.get('name')
+        person.age = request.POST.get('age')
+        person.save()
+        return HttpResponseRedirect('/')
+
+''' через класс временной переадресации HttpResponseRedirect, перенаправляем пользователя по пути '/', 
+т.е. выполняем редирект в корневую директорию сайта. Где он, согласно маршруту, будет обрабатываться функцией index(), 
+которая в свою очередь отобразит данные всех пользователей(в том числе и только что добавленные) 
+на главной странице сайта в шаблоне index.html.'''
